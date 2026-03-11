@@ -28,8 +28,6 @@ Our datasets were cleaned and standardized using pandas (mainly ensuring all “
 st.header("Exploratory Fertility Patterns")
 st.markdown("In order to familiarize ourselves with the data and its structure, we generated three types of visualizations for Japan, the USA, and France.")
 st.subheader("Total Fertility Rates Over Time")
-st.markdown("The below graphs are linked with a year selection. Hovering over a year on one graph will highlight the year on the other graphs with a dot, for easy comparison.")
-
 
 # Loading Human Fertility Data
 #TFR Data
@@ -67,7 +65,7 @@ jpn_tfr = fix_year(jpn_tfr)
 usa_tfr = fix_year(usa_tfr)
 fra_tfr = fix_year(fra_tfr)
 
-year_sel = alt.selection_point(
+year_seltfr = alt.selection_point(
     name="year_hover",
     fields=["YearNum"],
     on="mouseover",
@@ -80,7 +78,7 @@ def make_chart(df, title):
     line = alt.Chart(df).mark_line().encode(
         x=alt.X("Year:T", axis=alt.Axis(format="%Y")),
         y=alt.Y("TFR:Q", title="Total Fertility Rate (TFR)"),
-        opacity=alt.condition(year_sel, alt.value(1), alt.value(0.2))
+        opacity=alt.condition(year_seltfr, alt.value(1), alt.value(0.2))
     )
 
     points = alt.Chart(df).mark_circle(size=80).encode(
@@ -90,7 +88,7 @@ def make_chart(df, title):
             alt.Tooltip("YearNum:Q", title="Year"),
             alt.Tooltip("TFR:Q", title="TFR", format=".2f")
         ],
-        opacity=alt.condition(year_sel, alt.value(1), alt.value(0))
+        opacity=alt.condition(year_seltfr, alt.value(1), alt.value(0))
     )
 
     return (line + points).properties(
@@ -107,7 +105,7 @@ linked_tfr = alt.hconcat(
     jpn_tfr_line,
     usa_tfr_line,
     fra_tfr_line
-).add_params(year_sel)
+).add_params(year_seltfr)
 
 st.altair_chart(linked_tfr, use_container_width=True)
 
