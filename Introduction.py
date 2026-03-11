@@ -349,7 +349,7 @@ jpn_mab_line = (
         y="MAB:Q",
         opacity=alt.value(0),
         tooltip=[alt.Tooltip("Year:T"), alt.Tooltip("MAB:Q", format=".2f")]
-    ).add_params(year_sel)
+    )
 ).properties(width=500, height=300, title="Japan")
 
 fra_mab["Year"] = pd.to_datetime(fra_mab["Year"], format="%Y")
