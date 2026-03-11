@@ -298,7 +298,8 @@ jpn_mab = pd.read_csv(
 jpn_mab["Country"] = "Japan"
 
 year_sel = alt.selection_point(
-    encodings=["x"],
+    fields = ["Year"],
+    #encodings=["x"],
     on="mouseover",
     nearest=True,
     empty=False,
