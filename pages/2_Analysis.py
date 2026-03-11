@@ -442,7 +442,7 @@ st.altair_chart(row3, use_container_width=True)
 st.caption("""These bar charts compare average GDP per capita growth and total fertility rates across the five countries for the selected decade. The comparison highlights substantial variation in economic growth and fertility across national contexts. India exhibits the highest growth and fertility levels, while developed economies such as Japan and Portugal display lower fertility despite more varied economic growth.""")
 
 births_df = pd.read_csv(
-     "Data/PRTbirthsRR.txt",
+     "data/PRTbirthsRR.txt",
     sep=r"\s+",
     skiprows=1,
     header=1,
