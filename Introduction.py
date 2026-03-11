@@ -56,10 +56,6 @@ fra_tfr["Country"] = "France"
 
 
 #TFR
-year_sel = alt.selection_point(
-    fields=["YearNum"], on="mouseover", nearest=True, empty=False, clear="mouseout"
-)
-
 def fix_year(df):
     df = df.copy()
     if not pd.api.types.is_datetime64_any_dtype(df["Year"]):
@@ -71,52 +67,48 @@ jpn_tfr = fix_year(jpn_tfr)
 usa_tfr = fix_year(usa_tfr)
 fra_tfr = fix_year(fra_tfr)
 
-jpn_tfr_line = (
-    alt.Chart(jpn_tfr).mark_line().encode(
+year_sel = alt.selection_point(
+    name="year_hover",
+    fields=["YearNum"],
+    on="mouseover",
+    nearest=True,
+    empty=False,
+    clear="mouseout"
+)
+
+def make_chart(df, title):
+    line = alt.Chart(df).mark_line().encode(
         x=alt.X("Year:T", axis=alt.Axis(format="%Y")),
         y=alt.Y("TFR:Q", title="Total Fertility Rate (TFR)"),
-        opacity=alt.condition(year_sel, alt.value(1), alt.value(0.15))
+        opacity=alt.condition(year_sel, alt.value(1), alt.value(0.2))
     )
-    +
-    alt.Chart(jpn_tfr).mark_circle(size=80).encode(
-        x="Year:T",
-        y="TFR:Q",
-        tooltip=[alt.Tooltip("YearNum:Q", title="Year"), "TFR:Q"],
-        opacity=alt.condition(year_sel, alt.value(1), alt.value(0))
-    ).add_params(year_sel)
-).properties(width=500, height=300, title="Japan")
 
-usa_tfr_line = (
-    alt.Chart(usa_tfr).mark_line().encode(
-        x=alt.X("Year:T", axis=alt.Axis(format="%Y")),
-        y=alt.Y("TFR:Q", title="Total Fertility Rate (TFR)"),
-        opacity=alt.condition(year_sel, alt.value(1), alt.value(0.15))
+    points = alt.Chart(df).mark_circle(size=80).encode(
+        x=alt.X("Year:T"),
+        y=alt.Y("TFR:Q"),
+        tooltip=[
+            alt.Tooltip("YearNum:Q", title="Year"),
+            alt.Tooltip("TFR:Q", title="TFR", format=".2f")
+        ],
+        opacity=alt.condition(year_sel, alt.value(1), alt.value(0))
     )
-    +
-    alt.Chart(usa_tfr).mark_circle(size=80).encode(
-        x="Year:T",
-        y="TFR:Q",
-        tooltip=[alt.Tooltip("YearNum:Q", title="Year"), "TFR:Q"],
-        opacity=alt.condition(year_sel, alt.value(1), alt.value(0))
-    ).add_params(year_sel)
-).properties(width=500, height=300, title="USA")
 
-fra_tfr_line = (
-    alt.Chart(fra_tfr).mark_line().encode(
-        x=alt.X("Year:T", axis=alt.Axis(format="%Y")),
-        y=alt.Y("TFR:Q", title="Total Fertility Rate (TFR)"),
-        opacity=alt.condition(year_sel, alt.value(1), alt.value(0.15))
+    return (line + points).properties(
+        width=300,
+        height=300,
+        title=title
     )
-    +
-    alt.Chart(fra_tfr).mark_circle(size=80).encode(
-        x="Year:T",
-        y="TFR:Q",
-        tooltip=[alt.Tooltip("YearNum:Q", title="Year"), "TFR:Q"],
-        opacity=alt.condition(year_sel, alt.value(1), alt.value(0))
-    ).add_params(year_sel)
-).properties(width=500, height=300, title="France")
 
-linked_tfr = jpn_tfr_line | usa_tfr_line | fra_tfr_line
+jpn_tfr_line = make_chart(jpn_tfr, "Japan")
+usa_tfr_line = make_chart(usa_tfr, "USA")
+fra_tfr_line = make_chart(fra_tfr, "France")
+
+linked_tfr = alt.hconcat(
+    jpn_tfr_line,
+    usa_tfr_line,
+    fra_tfr_line
+).add_params(year_sel)
+
 st.altair_chart(linked_tfr, use_container_width=True)
 
 st.caption("""
